@@ -7,11 +7,17 @@ import java.sql.Statement;
 
 public class DBManager {
 
-    private static final String USER_NAME = "P11"; //your DB username
-    private static final String PASSWORD = "pdc"; //your DB password
-    private static final String URL = "jdbc:derby://localhost:1527/QuizDB; create=true";  //url of the DB host
+    private static final String URL = "jdbc:derby:QuizDB_Ebd;create=true"; // Embedded mode URL
 
     private static Connection connection;
+
+    static {
+        try {
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+        } catch (ClassNotFoundException e) {
+            System.out.println("Failed to load Derby driver: " + e.getMessage());
+        }
+    }
 
     public DBManager() {
         establishConnection();
@@ -28,10 +34,10 @@ public class DBManager {
         return connection;
     }
 
-    //Establish connection
+    // Establish connection
     public static void establishConnection() {
         try {
-            connection = DriverManager.getConnection(URL, USER_NAME, PASSWORD);
+            connection = DriverManager.getConnection(URL);
             System.out.println("Connection established successfully.");
         } catch (SQLException ex) {
             System.out.println("Failed to establish connection: " + ex.getMessage());
@@ -45,6 +51,9 @@ public class DBManager {
                     + "quiz_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), "
                     + "quiz_name VARCHAR(255) UNIQUE NOT NULL)");
 
+            // Reset auto-increment counter for quiz_id column
+            stmt.executeUpdate("ALTER TABLE QUIZZES ALTER COLUMN quiz_id RESTART WITH 1");
+
             // Create Questions table
             stmt.executeUpdate("CREATE TABLE QUESTIONS ("
                     + "question_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), "
@@ -56,6 +65,17 @@ public class DBManager {
         } catch (SQLException e) {
             if (!e.getSQLState().equals("X0Y32")) { // Table already exists
                 e.printStackTrace();
+            }
+        }
+    }
+
+    // Shutdown the database
+    public static void shutdownDatabase() {
+        try {
+            DriverManager.getConnection("jdbc:derby:;shutdown=true");
+        } catch (SQLException e) {
+            if (!"XJ015".equals(e.getSQLState())) {
+                System.out.println("Database shutdown failed: " + e.getMessage());
             }
         }
     }

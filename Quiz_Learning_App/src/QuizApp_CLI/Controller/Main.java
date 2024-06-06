@@ -1,14 +1,5 @@
-
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
 package QuizApp_CLI.Controller;
 
-/**
- *
- * @author jakoi
- */
 import QuizApp_CLI.db.DBManager;
 
 public class Main {
@@ -26,6 +17,9 @@ public class Main {
         } catch (Exception e) {
             System.out.println("An error occurred while starting the application: " + e.getMessage());
             e.printStackTrace();
+        } finally {
+            // Shutdown the database
+            DBManager.shutdownDatabase();
         }
     }
 }

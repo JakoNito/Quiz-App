@@ -2,6 +2,12 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group/>
+        <group>
+            <file>file:/C:/Users/jakoi/Documents/GitHub/Quiz-App/Quiz_Learning_App/src/QuizApp_CLI/db/DBManager.java</file>
+            <file>file:/C:/Users/jakoi/Documents/GitHub/Quiz-App/Quiz_Learning_App/src/QuizApp_CLI/db/DataManager.java</file>
+            <file>file:/C:/Users/jakoi/Documents/GitHub/Quiz-App/Quiz_Learning_App/src/QuizApp_CLI/Controller/QuizApp.java</file>
+            <file>file:/C:/Users/jakoi/Documents/GitHub/Quiz-App/Quiz_Learning_App/src/QuizApp_CLI/Model/QuizManager.java</file>
+            <file>file:/C:/Users/jakoi/Documents/GitHub/Quiz-App/Quiz_Learning_App/src/QuizApp_CLI/Controller/Main.java</file>
+        </group>
     </open-files>
 </project-private>

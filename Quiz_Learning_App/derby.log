@@ -1,14 +1,13 @@
-Thu Jun 06 11:48:50 NZST 2024 : Apache Derby Network Server - 10.14.2.0 - (1828579) started and ready to accept connections on port 1527
 ----------------------------------------------------------------
-Thu Jun 06 11:48:52 NZST 2024:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-018f-eace-2934-ffffcfcefa85 
-on database directory C:\Users\jakoi\Documents\GitHub\Quiz-App\Quiz_Learning_App\QuizDB with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@30946e09 
-Loaded from file:/C:/Users/jakoi/Documents/NetBeansProjects/db-derby-10.14.2.0-lib/lib/derby.jar
+Thu Jun 06 18:58:32 NZST 2024:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-018f-ec57-8e6e-00000f800000 
+on database directory C:\Users\jakoi\Documents\GitHub\Quiz-App\Quiz_Learning_App\QuizDB_Ebd with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@18ef96 
+Loaded from file:/C:/Users/jakoi/Documents/NetBeansProjects/Quiz_Learning_App/lib/derby.jar
 java.vendor=Oracle Corporation
 java.runtime.version=11.0.21+9-LTS-193
-user.dir=C:\Users\jakoi\Documents\NetBeansProjects\db-derby-10.14.2.0-lib
+user.dir=C:\Users\jakoi\Documents\GitHub\Quiz-App\Quiz_Learning_App
 os.name=Windows 10
 os.arch=amd64
 os.version=10.0
-derby.system.home=C:\Users\jakoi\Documents\GitHub\Quiz-App\Quiz_Learning_App
+derby.system.home=null
 Database Class Loader started - derby.database.classpath=''
