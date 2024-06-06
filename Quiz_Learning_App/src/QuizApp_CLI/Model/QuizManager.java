@@ -1,8 +1,10 @@
 package QuizApp_CLI.Model;
 
+import QuizApp_CLI.db.DataManager;
 import QuizApp_CLI.View.QuestionDisplayMode;
-import QuizApp_CLI.Controller.MultiChoiceMode;
-import QuizApp_CLI.Controller.BlindMode;
+import QuizApp_CLI.View.MultiChoiceMode;
+import QuizApp_CLI.View.BlindMode;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,7 +16,7 @@ public class QuizManager {
 
     private Map<String, QuizStructure> quizzes = new HashMap<>();
     private UserManager userManager = new UserManager();
-    private FileIOManager fileIOManager = new FileIOManager();
+    private DataManager dataManager = new DataManager();
     private Scanner scanner = new Scanner(System.in);
 
     public QuizManager() {
@@ -23,7 +25,6 @@ public class QuizManager {
     }
 
     public void createQuiz() {
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Enter the quiz name:");
         String quizName = scanner.nextLine();
         System.out.println();
@@ -64,6 +65,11 @@ public class QuizManager {
                 quizStructure = entry.getValue();
                 break;
             }
+        }
+
+        if (quizStructure == null) {
+            System.out.println("Quiz not found.");
+            return;
         }
 
         User user = userManager.getOrCreateUser();
@@ -162,12 +168,13 @@ public class QuizManager {
     }
 
     public void loadData() {
-        // Load data from file
-        fileIOManager.loadDataFromFiles(quizzes, "quizzes.txt");
+        // Load data from database
+        dataManager.loadDataFromFiles(quizzes);
     }
 
     public void saveData() {
-        fileIOManager.saveDataToFiles(quizzes, "quizzes.txt");
+        // Save data to database
+        dataManager.saveDataToFiles(quizzes);
     }
 
     private int getIntInput() {

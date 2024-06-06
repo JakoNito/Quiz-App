@@ -5,7 +5,9 @@
 package QuizApp_CLI.Controller;
 
 import QuizApp_CLI.Model.QuizManager;
+import QuizApp_CLI.db.DBManager;
 import java.util.Scanner;
+
 /**
  *
  * @author jakoi
@@ -32,6 +34,7 @@ public class QuizApp {
                     break;
                 case 3:
                     System.out.println("Exiting...");
+                    closeDatabase();
                     return;
                 default:
                     System.out.println("Invalid choice, please try again.");
@@ -45,6 +48,16 @@ public class QuizApp {
             System.out.println("Invalid input. Please enter a number:");
             scanner.next(); // Consume invalid input
         }
-        return scanner.nextInt();
+        int input = scanner.nextInt();
+        scanner.nextLine(); // Consume newline character
+        return input;
+    }
+
+    private void closeDatabase() {
+        try {
+            DBManager.getConnection().close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

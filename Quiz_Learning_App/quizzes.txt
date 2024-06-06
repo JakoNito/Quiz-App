@@ -1,4 +1,0 @@
-Computers:What is the heart of a computer|cpu,d|d,
-Universe:What is the smallest planet|Mercury,What is the biggest planet|Jupiter,What planet has a big ring|saturn,Which one of these isn't a planet?|pluto,
-Minecraft:are diamonds rare?|yes,what colour is a creeper?|green,
-Sports:What is a popular sport|Basketbalk,

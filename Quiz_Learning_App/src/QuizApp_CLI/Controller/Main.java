@@ -9,14 +9,23 @@ package QuizApp_CLI.Controller;
  *
  * @author jakoi
  */
+import QuizApp_CLI.db.DBManager;
+
 public class Main {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
-        QuizApp quizApp = new QuizApp();
-        quizApp.run();
+        try {
+            // Initialize the database
+            DBManager dbManager = new DBManager();
+            // Optionally, setup database tables if needed
+            dbManager.setupDatabase();
+
+            // Start the quiz application
+            QuizApp quizApp = new QuizApp();
+            quizApp.run();
+        } catch (Exception e) {
+            System.out.println("An error occurred while starting the application: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
-    
 }
