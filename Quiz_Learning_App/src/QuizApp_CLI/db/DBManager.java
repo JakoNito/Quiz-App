@@ -4,16 +4,18 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 
 public class DBManager {
 
     private static final String URL = "jdbc:derby:QuizDB_Ebd;create=true"; // Embedded mode URL
-
     private static Connection connection;
 
     static {
         try {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+            System.out.println("Derby driver loaded successfully.");
         } catch (ClassNotFoundException e) {
             System.out.println("Failed to load Derby driver: " + e.getMessage());
         }
@@ -45,27 +47,44 @@ public class DBManager {
     }
 
     public static void setupDatabase() {
-        try (Statement stmt = getConnection().createStatement()) {
-            // Create Quizzes table
-            stmt.executeUpdate("CREATE TABLE QUIZZES ("
-                    + "quiz_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), "
-                    + "quiz_name VARCHAR(255) UNIQUE NOT NULL)");
+        try (Connection conn = getConnection();
+             Statement stmt = conn.createStatement()) {
+            
+            if (!doesTableExist(conn, "QUIZZES")) {
+                // Create Quizzes table
+                stmt.executeUpdate("CREATE TABLE QUIZZES ("
+                        + "quiz_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), "
+                        + "quiz_name VARCHAR(255) UNIQUE NOT NULL)");
+                System.out.println("Quizzes table created successfully.");
+            }
 
-            // Reset auto-increment counter for quiz_id column
-            stmt.executeUpdate("ALTER TABLE QUIZZES ALTER COLUMN quiz_id RESTART WITH 1");
-
-            // Create Questions table
-            stmt.executeUpdate("CREATE TABLE QUESTIONS ("
-                    + "question_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), "
-                    + "quiz_id INT, "
-                    + "question_text VARCHAR(255), "
-                    + "correct_answer VARCHAR(255), "
-                    + "FOREIGN KEY (quiz_id) REFERENCES Quizzes (quiz_id))");
+            if (!doesTableExist(conn, "QUESTIONS")) {
+                // Create Questions table
+                stmt.executeUpdate("CREATE TABLE QUESTIONS ("
+                        + "question_id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1), "
+                        + "quiz_id INT, "
+                        + "question_text VARCHAR(255), "
+                        + "correct_answer VARCHAR(255), "
+                        + "FOREIGN KEY (quiz_id) REFERENCES Quizzes (quiz_id))");
+                System.out.println("Questions table created successfully.");
+            }
 
         } catch (SQLException e) {
-            if (!e.getSQLState().equals("X0Y32")) { // Table already exists
-                e.printStackTrace();
+            System.out.println("Error setting up the database: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Check if a table exists in the database
+    private static boolean doesTableExist(Connection conn, String tableName) {
+        try {
+            DatabaseMetaData dbMetaData = conn.getMetaData();
+            try (ResultSet rs = dbMetaData.getTables(null, null, tableName.toUpperCase(), null)) {
+                return rs.next();
             }
+        } catch (SQLException e) {
+            System.out.println("Failed to check if table exists: " + e.getMessage());
+            return false;
         }
     }
 
@@ -76,6 +95,8 @@ public class DBManager {
         } catch (SQLException e) {
             if (!"XJ015".equals(e.getSQLState())) {
                 System.out.println("Database shutdown failed: " + e.getMessage());
+            } else {
+                System.out.println("Database shutdown successfully.");
             }
         }
     }

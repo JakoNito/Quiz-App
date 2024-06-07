@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-Thu Jun 06 18:58:32 NZST 2024:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-018f-ec57-8e6e-00000f800000 
+Sat Jun 08 00:48:31 NZST 2024:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-018f-f2be-5679-00000f800000 
 on database directory C:\Users\jakoi\Documents\GitHub\Quiz-App\Quiz_Learning_App\QuizDB_Ebd with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@18ef96 
 Loaded from file:/C:/Users/jakoi/Documents/NetBeansProjects/Quiz_Learning_App/lib/derby.jar
 java.vendor=Oracle Corporation
@@ -11,3 +11,9 @@ os.arch=amd64
 os.version=10.0
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''
+----------------------------------------------------------------
+Sat Jun 08 00:48:56 NZST 2024: Shutting down Derby engine
+----------------------------------------------------------------
+Sat Jun 08 00:48:56 NZST 2024:
+Shutting down instance a816c00e-018f-f2be-5679-00000f800000 on database directory C:\Users\jakoi\Documents\GitHub\Quiz-App\Quiz_Learning_App\QuizDB_Ebd with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@18ef96 
+----------------------------------------------------------------
