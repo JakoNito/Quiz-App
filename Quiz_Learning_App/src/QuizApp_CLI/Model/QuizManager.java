@@ -30,6 +30,10 @@ public class QuizManager {
         return quizzes.get(quizName);
     }
 
+    public User getUser(String username) {
+        return userManager.getOrCreateUser(username);
+    }
+
     public void loadQuiz(String quizName, JFrame frame, String username) {
         QuizStructure quizStructure = quizzes.get(quizName);
         if (quizStructure == null) {
@@ -37,7 +41,7 @@ public class QuizManager {
             return;
         }
 
-        User user = userManager.getOrCreateUser(frame, username);
+        User user = userManager.getOrCreateUser(username);
 
         List<Question> questions = quizStructure.getQuestions();
 
@@ -58,7 +62,7 @@ public class QuizManager {
             }
         }
 
-        JOptionPane.showMessageDialog(frame, "Your score: " + user.getScore());
+        JOptionPane.showMessageDialog(frame, username + ", you scored " + user.getScore() + "/" + questions.size());
     }
 
     public String[] getQuizNames() {

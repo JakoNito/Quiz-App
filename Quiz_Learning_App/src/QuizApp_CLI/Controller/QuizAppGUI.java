@@ -9,8 +9,9 @@ package QuizApp_CLI.Controller;
  * @author johann
  */
 import QuizApp_CLI.Model.QuizManager;
-import QuizApp_CLI.Model.Question;
 import QuizApp_CLI.Model.QuizStructure;
+import QuizApp_CLI.Model.Question;
+import QuizApp_CLI.Model.User;
 import QuizApp_CLI.View.BlindMode;
 import QuizApp_CLI.View.MultiChoiceMode;
 import QuizApp_CLI.View.QuestionDisplayMode;
@@ -20,6 +21,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class QuizAppGUI {
@@ -317,14 +319,18 @@ public class QuizAppGUI {
         QuizStructure quizStructure = quizManager.getQuiz(quizName);
         List<Question> questions = quizStructure.getQuestions();
 
-        QuestionDisplayMode displayMode;
         if (mode == 1) {
-            displayMode = new BlindMode();
+            startBlindMode(questions);
         } else {
-            displayMode = new MultiChoiceMode(quizStructure.getAllChoices(), frame);
+            startMultiChoiceMode(quizStructure, questions);
         }
+    }
+
+    private void startBlindMode(List<Question> questions) {
+        User user = quizManager.getUser(username);
 
         for (Question question : questions) {
+            QuestionDisplayMode displayMode = new BlindMode();
             displayMode.displayQuestion(question);
             String userAnswer = JOptionPane.showInputDialog(frame, question.getQuestion());
             if (userAnswer == null || userAnswer.equalsIgnoreCase("x")) {
@@ -333,12 +339,67 @@ public class QuizAppGUI {
             }
             if (question.isCorrect(userAnswer)) {
                 JOptionPane.showMessageDialog(frame, "Correct!");
+                user.increaseScore();
             } else {
                 JOptionPane.showMessageDialog(frame, "Incorrect! Correct answer: " + question.getCorrectAnswer());
             }
         }
+
+        JOptionPane.showMessageDialog(frame, username + ", you scored " + user.getScore() + "/" + questions.size());
     }
 
+    private void startMultiChoiceMode(QuizStructure quizStructure, List<Question> questions) {
+        User user = quizManager.getUser(username);
+        int currentQuestionIndex = 0;
 
+        displayMultiChoiceQuestion(quizStructure, questions, currentQuestionIndex, user);
+    }
+
+    private void displayMultiChoiceQuestion(QuizStructure quizStructure, List<Question> questions, int index, User user) {
+        if (index >= questions.size()) {
+            JOptionPane.showMessageDialog(frame, username + ", you scored " + user.getScore() + "/" + questions.size());
+            showMainMenu();
+            return;
+        }
+
+        Question question = questions.get(index);
+        List<String> choices = new ArrayList<>(quizStructure.getAllChoices());
+        Collections.shuffle(choices);
+
+        frame.getContentPane().removeAll();
+        frame.setLayout(new BorderLayout());
+
+        JLabel questionLabel = new JLabel(question.getQuestion());
+        questionLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        frame.add(questionLabel, BorderLayout.NORTH);
+
+        JPanel choicesPanel = new JPanel(new GridLayout(4, 1, 10, 10));
+        for (String choice : choices) {
+            JButton choiceButton = new JButton(choice);
+            choiceButton.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (question.isCorrect(choice)) {
+                        user.increaseScore();
+                    }
+                    displayMultiChoiceQuestion(quizStructure, questions, index + 1, user);
+                }
+            });
+            choicesPanel.add(choiceButton);
+        }
+
+        frame.add(choicesPanel, BorderLayout.CENTER);
+
+        JButton nextQuestionButton = new JButton("Next Question");
+        nextQuestionButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                displayMultiChoiceQuestion(quizStructure, questions, index + 1, user);
+            }
+        });
+
+        frame.add(nextQuestionButton, BorderLayout.SOUTH);
+
+        frame.revalidate();
+        frame.repaint();
+    }
 }
 

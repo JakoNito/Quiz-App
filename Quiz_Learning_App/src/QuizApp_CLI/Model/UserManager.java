@@ -16,7 +16,7 @@ import javax.swing.*;
 public class UserManager {
     private Map<String, User> users = new HashMap<>();
 
-    public User getOrCreateUser(JFrame frame, String username) {
+    public User getOrCreateUser(String username) {
         User user = users.get(username);
         if (user == null) {
             user = new User(username);
