@@ -10,6 +10,10 @@ package QuizApp_CLI.Controller;
  */
 import QuizApp_CLI.Model.QuizManager;
 import QuizApp_CLI.Model.Question;
+import QuizApp_CLI.Model.QuizStructure;
+import QuizApp_CLI.View.BlindMode;
+import QuizApp_CLI.View.MultiChoiceMode;
+import QuizApp_CLI.View.QuestionDisplayMode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -220,7 +224,7 @@ public class QuizAppGUI {
             public void actionPerformed(ActionEvent e) {
                 String selectedQuiz = (String) quizComboBox.getSelectedItem();
                 if (selectedQuiz != null && !selectedQuiz.trim().isEmpty()) {
-                    quizManager.loadQuiz(selectedQuiz, frame, username);
+                    showQuizModeOptions(selectedQuiz);
                 } else {
                     JOptionPane.showMessageDialog(frame, "Please select a quiz to load.");
                 }
@@ -267,4 +271,74 @@ public class QuizAppGUI {
         }
     }
 
+    private void showQuizModeOptions(String selectedQuiz) {
+        frame.getContentPane().removeAll();
+        frame.setLayout(new BorderLayout());
+
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 2, 10, 10));
+        JButton enterAnswerModeButton = new JButton("Enter Answer Mode");
+        JButton multipleChoiceModeButton = new JButton("Multiple Choice Mode");
+
+        enterAnswerModeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                startQuiz(selectedQuiz, 1);  // Start quiz in Blind Mode
+            }
+        });
+
+        multipleChoiceModeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                startQuiz(selectedQuiz, 2);  // Start quiz in Multi-choice Mode
+            }
+        });
+
+        buttonPanel.add(enterAnswerModeButton);
+        buttonPanel.add(multipleChoiceModeButton);
+
+        frame.add(buttonPanel, BorderLayout.CENTER);
+
+        JPanel exitPanel = new JPanel();
+        JButton exitButton = new JButton("Exit");
+
+        exitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showMainMenu();
+            }
+        });
+
+        exitPanel.add(exitButton);
+        frame.add(exitPanel, BorderLayout.SOUTH);
+
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+    }
+
+    private void startQuiz(String quizName, int mode) {
+        QuizStructure quizStructure = quizManager.getQuiz(quizName);
+        List<Question> questions = quizStructure.getQuestions();
+
+        QuestionDisplayMode displayMode;
+        if (mode == 1) {
+            displayMode = new BlindMode();
+        } else {
+            displayMode = new MultiChoiceMode(quizStructure.getAllChoices(), frame);
+        }
+
+        for (Question question : questions) {
+            displayMode.displayQuestion(question);
+            String userAnswer = JOptionPane.showInputDialog(frame, question.getQuestion());
+            if (userAnswer == null || userAnswer.equalsIgnoreCase("x")) {
+                JOptionPane.showMessageDialog(frame, "Exiting quiz...");
+                return;
+            }
+            if (question.isCorrect(userAnswer)) {
+                JOptionPane.showMessageDialog(frame, "Correct!");
+            } else {
+                JOptionPane.showMessageDialog(frame, "Incorrect! Correct answer: " + question.getCorrectAnswer());
+            }
+        }
+    }
+
+
 }
+

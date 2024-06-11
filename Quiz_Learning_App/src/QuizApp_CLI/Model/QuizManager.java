@@ -26,6 +26,10 @@ public class QuizManager {
         saveData(); // Save the quizzes after adding a new quiz
     }
 
+    public QuizStructure getQuiz(String quizName) {
+        return quizzes.get(quizName);
+    }
+
     public void loadQuiz(String quizName, JFrame frame, String username) {
         QuizStructure quizStructure = quizzes.get(quizName);
         if (quizStructure == null) {
@@ -37,21 +41,9 @@ public class QuizManager {
 
         List<Question> questions = quizStructure.getQuestions();
 
-        String modeChoice = JOptionPane.showInputDialog(frame, "Select display mode:\n1. Blind Mode\n2. Multi-choice Mode");
-
-        QuestionDisplayMode displayMode;
-        switch (modeChoice) {
-            case "1":
-                displayMode = new BlindMode();
-                break;
-            case "2":
-                displayMode = new MultiChoiceMode(quizStructure.getAllChoices(), frame);
-                break;
-            default:
-                displayMode = new BlindMode();
-        }
-
         for (Question question : questions) {
+            // Default to BlindMode if user is not prompted for mode
+            QuestionDisplayMode displayMode = new BlindMode();
             displayMode.displayQuestion(question);
             String userAnswer = JOptionPane.showInputDialog(frame, question.getQuestion());
             if (userAnswer == null || userAnswer.equalsIgnoreCase("x")) {
@@ -88,3 +80,4 @@ public class QuizManager {
         dataManager.saveDataToFiles(quizzes);
     }
 }
+
