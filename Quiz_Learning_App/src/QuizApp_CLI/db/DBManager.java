@@ -75,7 +75,7 @@ public class DBManager {
         }
     }
 
-    // Check if a table exists in the database
+    // Check if a table exists in database
     private static boolean doesTableExist(Connection conn, String tableName) {
         try {
             DatabaseMetaData dbMetaData = conn.getMetaData();
