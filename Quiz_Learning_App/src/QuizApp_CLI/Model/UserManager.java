@@ -7,33 +7,21 @@ package QuizApp_CLI.Model;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import javax.swing.*;
 /**
  *
  * @author jakoi
  */
 
 public class UserManager {
-    private Scanner scanner = new Scanner(System.in);
     private Map<String, User> users = new HashMap<>();
 
-    public User getOrCreateUser() {
-        System.out.println("Enter your username:");
-        String username = getStringInput();
-        System.out.println();
-
-        User user = users.get(username);
-        if (user == null) {
-            user = new User(username);
-            users.put(username, user);
+    public User getOrCreateUser(JFrame frame) {
+        String username = JOptionPane.showInputDialog(frame, "Enter your username:");
+        if (username == null || username.trim().isEmpty()) {
+            return null;
         }
-        return user;
-    }
 
-    private String getStringInput() {
-        while (!scanner.hasNextLine()) {
-            System.out.println("Invalid input. Please enter a number:");
-            scanner.next(); // Consume invalid input
-        }
-        return scanner.nextLine();
+        return users.computeIfAbsent(username, User::new);
     }
 }

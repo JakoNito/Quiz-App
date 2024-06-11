@@ -6,6 +6,7 @@ package QuizApp_CLI.View;
 
 import QuizApp_CLI.Model.Question;
 import QuizApp_CLI.View.QuestionDisplayMode;
+import javax.swing.*;
 
 /**
  *
@@ -14,6 +15,6 @@ import QuizApp_CLI.View.QuestionDisplayMode;
 public class BlindMode extends QuestionDisplayMode {
     @Override
     public void displayQuestion(Question question) {
-        System.out.println(question.getQuestion());
+        JOptionPane.showMessageDialog(null, question.getQuestion());
     }
 }

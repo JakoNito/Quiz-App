@@ -2,8 +2,9 @@ package QuizApp_CLI.Controller;
 
 import QuizApp_CLI.db.DBManager;
 
-public class Main {
+import javax.swing.*;
 
+public class Main {
     public static void main(String[] args) {
         try {
             // Initialize the database
@@ -12,8 +13,10 @@ public class Main {
             dbManager.setupDatabase();
 
             // Start the quiz application
-            QuizApp quizApp = new QuizApp();
-            quizApp.run();
+            SwingUtilities.invokeLater(() -> {
+                QuizAppGUI quizAppGUI = new QuizAppGUI();
+                quizAppGUI.showMainMenu();
+            });
         } catch (Exception e) {
             System.out.println("An error occurred while starting the application: " + e.getMessage());
             e.printStackTrace();

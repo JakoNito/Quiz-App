@@ -4,60 +4,73 @@
  */
 package QuizApp_CLI.Controller;
 
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import QuizApp_CLI.Model.QuizManager;
-import QuizApp_CLI.db.DBManager;
-import java.util.Scanner;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-/**
- *
- * @author jakoi
- */
 public class QuizApp {
-    private Scanner scanner = new Scanner(System.in);
     private QuizManager quizManager = new QuizManager();
 
     public void run() {
-        while (true) {
-            System.out.println("Welcome to the Quiz App!");
-            System.out.println("1. Create a Quiz");
-            System.out.println("2. Load a Quiz");
-            System.out.println("3. Quit");
+        JFrame frame = new JFrame("Quiz App");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 200);
 
-            int choice = getIntInput();
-            System.out.println();
-            switch (choice) {
-                case 1:
-                    quizManager.createQuiz();
-                    break;
-                case 2:
-                    quizManager.loadQuiz();
-                    break;
-                case 3:
-                    System.out.println("Exiting...");
-                    closeDatabase();
-                    return;
-                default:
-                    System.out.println("Invalid choice, please try again.");
-                    System.out.println();
+        JPanel panel = new JPanel();
+        frame.add(panel);
+        placeComponents(panel);
+
+        frame.setVisible(true);
+    }
+
+    private void placeComponents(JPanel panel) {
+        panel.setLayout(null);
+
+        JLabel titleLabel = new JLabel("Welcome to the Quiz App!");
+        titleLabel.setBounds(10, 20, 200, 25);
+        panel.add(titleLabel);
+
+        JButton createQuizButton = new JButton("Create a Quiz");
+        createQuizButton.setBounds(10, 50, 160, 25);
+        createQuizButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String quizName = JOptionPane.showInputDialog("Enter the quiz name:");
+                if (quizName != null && !quizName.trim().isEmpty()) {
+                    quizManager.createQuiz(quizName);
+                }
             }
-        }
-    }
+        });
+        panel.add(createQuizButton);
 
-    private int getIntInput() {
-        while (!scanner.hasNextInt()) {
-            System.out.println("Invalid input. Please enter a number:");
-            scanner.next(); // Consume invalid input
-        }
-        int input = scanner.nextInt();
-        scanner.nextLine(); // Consume newline character
-        return input;
-    }
+        JButton loadQuizButton = new JButton("Load a Quiz");
+        loadQuizButton.setBounds(10, 80, 160, 25);
+        loadQuizButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String quizName = (String) JOptionPane.showInputDialog(null, "Select Quiz",
+                        "Quiz Selector", JOptionPane.QUESTION_MESSAGE, null,
+                        quizManager.getQuizNames(), quizManager.getQuizNames()[0]);
+                if (quizName != null) {
+                    quizManager.loadQuiz(quizName, new JFrame());
+                }
+            }
+        });
+        panel.add(loadQuizButton);
 
-    private void closeDatabase() {
-        try {
-            DBManager.getConnection().close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        JButton quitButton = new JButton("Quit");
+        quitButton.setBounds(10, 110, 160, 25);
+        quitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        panel.add(quitButton);
     }
 }
+

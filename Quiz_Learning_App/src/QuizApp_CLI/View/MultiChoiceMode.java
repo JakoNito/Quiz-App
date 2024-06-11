@@ -16,33 +16,27 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
-
+import QuizApp_CLI.Model.Question;
+import javax.swing.*;
+import java.util.Collections;
+import java.util.List;
 
 public class MultiChoiceMode extends QuestionDisplayMode {
     private List<String> choices;
-    private Scanner scanner;
+    private JFrame frame;
 
-    public MultiChoiceMode(List<String> choices, Scanner scanner) {
+    public MultiChoiceMode(List<String> choices, JFrame frame) {
         this.choices = choices;
-        this.scanner = scanner;
+        this.frame = frame;
     }
 
     @Override
     public void displayQuestion(Question question) {
-        System.out.println(question.getQuestion());
-        List<String> allChoices = new ArrayList<>(choices); // Start with common choices
-        List<String> questionChoices = question.getChoices(); // Get question-specific choices
-        for (String choice : questionChoices) {
-            if (!allChoices.contains(choice)) { // Add only if not already present
-                allChoices.add(choice);
-            }
+        Collections.shuffle(choices);
+        StringBuilder message = new StringBuilder(question.getQuestion() + "\n");
+        for (int i = 0; i < choices.size(); i++) {
+            message.append((char) ('a' + i)).append(". ").append(choices.get(i)).append("\n");
         }
-        if (!allChoices.contains(question.getCorrectAnswer())) { // Ensure correct answer is included
-            allChoices.add(question.getCorrectAnswer());
-        }
-        Collections.shuffle(allChoices);
-        for (int i = 0; i < allChoices.size(); i++) {
-            System.out.println((char) ('a' + i) + ". " + allChoices.get(i));
-        }
+        JOptionPane.showMessageDialog(frame, message.toString());
     }
 }

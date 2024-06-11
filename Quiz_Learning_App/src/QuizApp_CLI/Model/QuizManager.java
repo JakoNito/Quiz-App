@@ -11,179 +11,133 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import QuizApp_CLI.db.DataManager;
+
+import javax.swing.*;
+import java.util.*;
 
 public class QuizManager {
-
     private Map<String, QuizStructure> quizzes = new HashMap<>();
     private UserManager userManager = new UserManager();
     private DataManager dataManager = new DataManager();
-    private Scanner scanner = new Scanner(System.in);
 
     public QuizManager() {
-        // Load data when the application starts
         loadData();
     }
 
-    public void createQuiz() {
-        System.out.println("Enter the quiz name:");
-        String quizName = scanner.nextLine();
-        System.out.println();
-
+    public void createQuiz(String quizName) {
         QuizStructure quizStructure = new QuizStructure(quizName);
         while (true) {
-            System.out.println("Enter question (or 'x' to finish):");
-            String questionText = scanner.nextLine();
-            if (questionText.equals("x")) {
+            String questionText = JOptionPane.showInputDialog("Enter question (or leave blank to finish):");
+            if (questionText == null || questionText.isEmpty()) {
                 break;
             }
 
-            System.out.println("Enter answer:");
-            String answer = scanner.nextLine();
-            System.out.println();
+            String answer = JOptionPane.showInputDialog("Enter answer:");
+            if (answer == null || answer.isEmpty()) {
+                break;
+            }
 
             quizStructure.addQuestion(new Question(questionText, answer));
         }
 
         quizzes.put(quizName, quizStructure);
-        saveData(); // Save the quizzes after adding a new quiz
+        saveData();
     }
 
-    public void loadQuiz() {
-        // Show available quizzes
-        System.out.println("Available quizzes to load:");
-        for (String quizName : quizzes.keySet()) {
-            System.out.println("- " + quizName);
-        }
-        System.out.println();
-        System.out.println("Enter the quiz name:");
-        String quizNameInput = scanner.nextLine().trim().toLowerCase(); // Convert input to lowercase
-        System.out.println();
-
-        QuizStructure quizStructure = null;
-        for (Map.Entry<String, QuizStructure> entry : quizzes.entrySet()) {
-            if (entry.getKey().toLowerCase().equals(quizNameInput)) { // Compare case-insensitively
-                quizStructure = entry.getValue();
-                break;
-            }
-        }
-
+    public void loadQuiz(String quizName, JFrame frame) {
+        QuizStructure quizStructure = quizzes.get(quizName);
         if (quizStructure == null) {
-            System.out.println("Quiz not found.");
+            JOptionPane.showMessageDialog(frame, "Quiz not found.");
             return;
         }
 
-        User user = userManager.getOrCreateUser();
+        User user = userManager.getOrCreateUser(frame);
         List<Question> questions = quizStructure.getQuestions();
 
-        // Check if the quiz has less than 4 questions
         if (questions.size() < 4) {
-            System.out.println("This quiz does not support the multi-choice mode due to insufficient questions.");
-            System.out.println("Defaulting to Blind Mode.");
-            System.out.println();
-            QuestionDisplayMode displayMode = new BlindMode();
-            for (Question question : questions) {
-                displayMode.displayQuestion(question);
-                System.out.println("Enter your answer:");
-                String userAnswer = scanner.nextLine();
-                System.out.println();
-                if (userAnswer.equalsIgnoreCase("x")) {
-                    System.out.println("Exiting quiz...");
-                    return;
-                }
-                if (question.isCorrect(userAnswer)) {
-                    System.out.println("Correct!");
-                    System.out.println();
-                    user.increaseScore();
-                } else {
-                    System.out.println("Incorrect!");
-                    System.out.println();
-                }
-            }
-            System.out.println("Your score: " + user.getScore());
+            JOptionPane.showMessageDialog(frame, "This quiz does not support the multi-choice mode due to insufficient questions.\nDefaulting to Blind Mode.");
+            loadBlindMode(questions, user, frame);
             return;
         }
 
-        // If the quiz has at least 4 questions, proceed with mode selection
-        System.out.println("Select display mode:");
-        System.out.println("1. Blind Mode");
-        System.out.println("2. Multi-choice Mode");
-        int modeChoice = getIntInput();
-        System.out.println();
+        String modeChoice = JOptionPane.showInputDialog(frame, "Select display mode:\n1. Blind Mode\n2. Multi-choice Mode");
 
-        QuestionDisplayMode displayMode;
         switch (modeChoice) {
-            case 1:
-                displayMode = new BlindMode();
+            case "1":
+                loadBlindMode(questions, user, frame);
                 break;
-            case 2:
-                // Create a random list of unique choices for multi-choice mode
-                List<String> uniqueChoices = new ArrayList<>();
-                for (Question q : questions) {
-                    uniqueChoices.add(q.getCorrectAnswer());
-                    List<String> wrongAnswers = q.getChoices();
-                    for (String choice : wrongAnswers) {
-                        if (!uniqueChoices.contains(choice)) {
-                            uniqueChoices.add(choice);
-                        }
-                    }
-                }
-                Collections.shuffle(uniqueChoices);
-                displayMode = new MultiChoiceMode(uniqueChoices.subList(0, 3), scanner); // Take first 3 random choices
+            case "2":
+                loadMultiChoiceMode(questions, user, frame);
                 break;
             default:
-                System.out.println("Invalid choice, defaulting to Blind Mode.");
-                System.out.println();
-                displayMode = new BlindMode();
+                JOptionPane.showMessageDialog(frame, "Invalid choice. Defaulting to Blind Mode.");
+                loadBlindMode(questions, user, frame);
         }
+    }
 
+    private void loadBlindMode(List<Question> questions, User user, JFrame frame) {
         for (Question question : questions) {
-            displayMode.displayQuestion(question);
-            System.out.println("Typer your answer:");
-            String userAnswer = scanner.nextLine();
-            if (userAnswer.equalsIgnoreCase("x")) {
-                System.out.println("Exiting quiz...");
-                System.out.println("=================================");
+            String userAnswer = JOptionPane.showInputDialog(frame, question.getQuestion());
+            if (userAnswer == null || userAnswer.equalsIgnoreCase("x")) {
+                JOptionPane.showMessageDialog(frame, "Exiting quiz...");
                 return;
             }
             if (question.isCorrect(userAnswer)) {
-                System.out.println("Correct!");
-                System.out.println();
+                JOptionPane.showMessageDialog(frame, "Correct!");
                 user.increaseScore();
             } else {
-                System.out.println("Incorrect!");
-                System.out.println();
+                JOptionPane.showMessageDialog(frame, "Incorrect! Correct answer: " + question.getCorrectAnswer());
             }
         }
-        System.out.println("Your score: " + user.getScore());
 
-        // Ask if the user wants to continue or quit
-        System.out.println("Continue (c) or Quit (x)?");
-        String choice = scanner.nextLine();
-        if (choice.equalsIgnoreCase("x")) {
-            System.out.println("Happy studying! Exiting quiz...");
-            System.exit(0);
-            return;
+        JOptionPane.showMessageDialog(frame, "Your score: " + user.getScore());
+    }
+
+    private void loadMultiChoiceMode(List<Question> questions, User user, JFrame frame) {
+        List<String> allChoices = new ArrayList<>();
+        for (Question q : questions) {
+            allChoices.add(q.getCorrectAnswer());
+            allChoices.addAll(q.getChoices());
         }
-        System.out.println("=================================");
+        Collections.shuffle(allChoices);
+
+        for (Question question : questions) {
+            List<String> choices = new ArrayList<>(question.getChoices());
+            choices.add(question.getCorrectAnswer());
+            Collections.shuffle(choices);
+
+            StringBuilder message = new StringBuilder(question.getQuestion() + "\n");
+            for (int i = 0; i < choices.size(); i++) {
+                message.append((char) ('a' + i)).append(". ").append(choices.get(i)).append("\n");
+            }
+
+            String userAnswer = JOptionPane.showInputDialog(frame, message.toString());
+            if (userAnswer == null || userAnswer.equalsIgnoreCase("x")) {
+                JOptionPane.showMessageDialog(frame, "Exiting quiz...");
+                return;
+            }
+
+            if (question.isCorrect(userAnswer)) {
+                JOptionPane.showMessageDialog(frame, "Correct!");
+                user.increaseScore();
+            } else {
+                JOptionPane.showMessageDialog(frame, "Incorrect! Correct answer: " + question.getCorrectAnswer());
+            }
+        }
+
+        JOptionPane.showMessageDialog(frame, "Your score: " + user.getScore());
+    }
+
+    public String[] getQuizNames() {
+        return quizzes.keySet().toArray(new String[0]);
     }
 
     public void loadData() {
-        // Load data from database
         dataManager.loadDataFromFiles(quizzes);
     }
 
     public void saveData() {
-        // Save data to database
         dataManager.saveDataToFiles(quizzes);
-    }
-
-    private int getIntInput() {
-        while (!scanner.hasNextInt()) {
-            System.out.println("Invalid input. Please enter a number:");
-            scanner.next(); // Consume invalid input
-        }
-        int input = scanner.nextInt();
-        scanner.nextLine(); // Consume newline character
-        return input;
     }
 }
