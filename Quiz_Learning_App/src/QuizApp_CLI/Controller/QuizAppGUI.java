@@ -10,8 +10,8 @@ package QuizApp_CLI.Controller;
  */
 
 import QuizApp_CLI.Model.QuizManager;
-import QuizApp_CLI.db.DBManager;
 import QuizApp_CLI.Model.Question;
+import QuizApp_CLI.Model.QuizStructure;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,7 +58,7 @@ public class QuizAppGUI {
         loadQuizButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (ensureUsername()) {
-                    showLoadQuiz();
+                    showLoadQuizScreen();
                 }
             }
         });
@@ -143,57 +143,88 @@ public class QuizAppGUI {
         buttonPanel.add(exitButton);
 
         frame.add(buttonPanel, BorderLayout.SOUTH);
+        frame.revalidate();
+        frame.repaint();
+    }
+
+    private void addQuestion() {
+        String questionText = questionField.getText();
+        String answerText = answerField.getText();
+        if (questionText.trim().isEmpty() || answerText.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Question and Answer cannot be empty.");
+            return;
+        }
+
+        questions.add(new Question(questionText, answerText));
+        questionListArea.append("Q: " + questionText + " A: " + answerText + "\n");
+
+        questionField.setText("");
+        answerField.setText("");
+    }
+
+    private void saveQuiz() {
+        String quizName = quizNameField.getText();
+        if (quizName.trim().isEmpty() || questions.isEmpty()) {
+            JOptionPane.showMessageDialog(frame, "Quiz name cannot be empty and must have at least one question.");
+            return;
+        }
+
+        quizManager.createQuiz(quizName, questions);
+        questions.clear();
+        questionListArea.setText("");
+        quizNameField.setText("");
+        JOptionPane.showMessageDialog(frame, "Quiz saved successfully!");
+    }
+
+    private void showLoadQuizScreen() {
+        frame.getContentPane().removeAll();
+        frame.setLayout(new BorderLayout());
+
+        JList<String> quizList = new JList<>(quizManager.getQuizNames());
+        quizList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        quizList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                String selectedQuiz = quizList.getSelectedValue();
+                if (selectedQuiz != null) {
+                    getQuizDetails(selectedQuiz);
+                }
+            }
+        });
+
+        frame.add(new JScrollPane(quizList), BorderLayout.WEST);
+
+        JTextArea quizDetailsArea = new JTextArea();
+        quizDetailsArea.setEditable(false);
+        frame.add(new JScrollPane(quizDetailsArea), BorderLayout.CENTER);
+
+        JButton loadButton = new JButton("Load Quiz");
+        loadButton.addActionListener(e -> {
+            String selectedQuiz = quizList.getSelectedValue();
+            if (selectedQuiz != null) {
+                quizManager.loadQuiz(selectedQuiz, frame, username);
+            }
+        });
+
+        frame.add(loadButton, BorderLayout.SOUTH);
 
         frame.revalidate();
         frame.repaint();
-        frame.setVisible(true);
     }
 
-private void addQuestion() {
-    String questionText = questionField.getText().trim();
-    String answerText = answerField.getText().trim();
-    if (!questionText.isEmpty() && !answerText.isEmpty()) {
-        // Append a question mark if it's not already included
-        if (!questionText.endsWith("?")) {
-            questionText += "?";
-        }
-        questions.add(new Question(questionText, answerText));
-        questionListArea.append("Q: " + questionText + " A: " + answerText + "\n");
-        questionField.setText("");
-        answerField.setText("");
-    } else {
-        JOptionPane.showMessageDialog(frame, "Both question and answer fields must be filled.");
-    }
-}
+    private void getQuizDetails(String quizName) {
+        QuizStructure quizStructure = quizManager.getQuizByName(quizName);
+        if (quizStructure != null) {
+            StringBuilder details = new StringBuilder();
+            details.append("Quiz Name: ").append(quizStructure.getQuizName()).append("\n");
+            details.append("Questions:\n");
+            for (Question question : quizStructure.getQuestions()) {
+                details.append("Q: ").append(question.getQuestion()).append("\n");
+            }
 
-
-    private void saveQuiz() {
-        String quizName = quizNameField.getText().trim();
-        if (quizName.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "Quiz name cannot be empty.");
-            return;
-        }
-        if (questions.isEmpty()) {
-            JOptionPane.showMessageDialog(frame, "No questions added to the quiz.");
-            return;
-        }
-        quizManager.createQuiz(quizName, questions);
-        JOptionPane.showMessageDialog(frame, "Quiz saved successfully!");
-        showMainMenu();
-    }
-
-    private void showLoadQuiz() {
-        String[] quizzes = quizManager.getQuizNames();
-        if (quizzes.length == 0) {
-            JOptionPane.showMessageDialog(frame, "No quizzes available.");
-            return;
-        }
-
-        String quizName = (String) JOptionPane.showInputDialog(frame, "Select a quiz:", "Load Quiz",
-                JOptionPane.QUESTION_MESSAGE, null, quizzes, quizzes[0]);
-
-        if (quizName != null && !quizName.isEmpty()) {
-            quizManager.loadQuiz(quizName, frame, username);
+            JTextArea quizDetailsArea = new JTextArea(details.toString());
+            quizDetailsArea.setEditable(false);
+            frame.add(new JScrollPane(quizDetailsArea), BorderLayout.CENTER);
         }
     }
+
 }

@@ -95,4 +95,12 @@ QuizStructure quizStructure = new QuizStructure(quizName, Collections.emptyList(
             System.out.println("Error saving quizzes: " + e.getMessage());
         }
     }
+
+    public void saveQuizzes(Map<String, QuizStructure> quizzes) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    public Map<String, QuizStructure> loadQuizzes() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

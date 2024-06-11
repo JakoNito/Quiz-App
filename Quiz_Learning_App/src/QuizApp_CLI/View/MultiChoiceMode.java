@@ -21,7 +21,7 @@ import javax.swing.*;
 import java.util.Collections;
 import java.util.List;
 
-public class MultiChoiceMode extends QuestionDisplayMode {
+public class MultiChoiceMode implements QuestionDisplayMode {
     private List<String> choices;
     private JFrame frame;
 
@@ -31,12 +31,17 @@ public class MultiChoiceMode extends QuestionDisplayMode {
     }
 
     @Override
-    public void displayQuestion(Question question) {
+    public void displayQuestion(JFrame frame, Question question) {
         Collections.shuffle(choices);
         StringBuilder message = new StringBuilder(question.getQuestion() + "\n");
         for (int i = 0; i < choices.size(); i++) {
             message.append((char) ('a' + i)).append(". ").append(choices.get(i)).append("\n");
         }
         JOptionPane.showMessageDialog(frame, message.toString());
+    }
+
+    @Override
+    public String getAnswer(JFrame frame) {
+        return JOptionPane.showInputDialog(frame, "Enter your answer:");
     }
 }

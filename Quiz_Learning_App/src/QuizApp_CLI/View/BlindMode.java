@@ -12,9 +12,14 @@ import javax.swing.*;
  *
  * @author jakoi
  */
-public class BlindMode extends QuestionDisplayMode {
+public class BlindMode implements QuestionDisplayMode {
     @Override
-    public void displayQuestion(Question question) {
-        JOptionPane.showMessageDialog(null, question.getQuestion());
+    public void displayQuestion(JFrame frame, Question question) {
+        JOptionPane.showMessageDialog(frame, question.getQuestion());
+    }
+
+    @Override
+    public String getAnswer(JFrame frame) {
+        return JOptionPane.showInputDialog(frame, "Enter your answer:");
     }
 }
