@@ -8,9 +8,7 @@ package QuizApp_CLI.Controller;
  *
  * @author johann
  */
-
 import QuizApp_CLI.Model.QuizManager;
-import QuizApp_CLI.db.DBManager;
 import QuizApp_CLI.Model.Question;
 
 import javax.swing.*;
@@ -29,6 +27,8 @@ public class QuizAppGUI {
     private JTextField answerField;
     private JTextArea questionListArea;
     private List<Question> questions;
+    private JTextField searchField;
+    private JComboBox<String> quizComboBox;
 
     public QuizAppGUI() {
         frame = new JFrame("Quiz Application");
@@ -41,8 +41,13 @@ public class QuizAppGUI {
 
     public void showMainMenu() {
         frame.getContentPane().removeAll();
-        frame.setLayout(new GridLayout(3, 1));
+        frame.setLayout(new BorderLayout());
 
+        JLabel titleLabel = new JLabel("Welcome to the Quiz App!", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        frame.add(titleLabel, BorderLayout.NORTH);
+
+        JPanel buttonPanel = new JPanel(new GridLayout(3, 1, 10, 10));
         JButton createQuizButton = new JButton("Create a Quiz");
         JButton loadQuizButton = new JButton("Load a Quiz");
         JButton quitButton = new JButton("Quit");
@@ -69,9 +74,11 @@ public class QuizAppGUI {
             }
         });
 
-        frame.add(createQuizButton);
-        frame.add(loadQuizButton);
-        frame.add(quitButton);
+        buttonPanel.add(createQuizButton);
+        buttonPanel.add(loadQuizButton);
+        buttonPanel.add(quitButton);
+
+        frame.add(buttonPanel, BorderLayout.CENTER);
 
         frame.revalidate();
         frame.repaint();
@@ -149,23 +156,21 @@ public class QuizAppGUI {
         frame.setVisible(true);
     }
 
-private void addQuestion() {
-    String questionText = questionField.getText().trim();
-    String answerText = answerField.getText().trim();
-    if (!questionText.isEmpty() && !answerText.isEmpty()) {
-        // Append a question mark if it's not already included
-        if (!questionText.endsWith("?")) {
-            questionText += "?";
+    private void addQuestion() {
+        String questionText = questionField.getText().trim();
+        String answerText = answerField.getText().trim();
+        if (!questionText.isEmpty() && !answerText.isEmpty()) {
+            if (!questionText.endsWith("?")) {
+                questionText += "?";
+            }
+            questions.add(new Question(questionText, answerText));
+            questionListArea.append("Q: " + questionText + " A: " + answerText + "\n");
+            questionField.setText("");
+            answerField.setText("");
+        } else {
+            JOptionPane.showMessageDialog(frame, "Both question and answer fields must be filled.");
         }
-        questions.add(new Question(questionText, answerText));
-        questionListArea.append("Q: " + questionText + " A: " + answerText + "\n");
-        questionField.setText("");
-        answerField.setText("");
-    } else {
-        JOptionPane.showMessageDialog(frame, "Both question and answer fields must be filled.");
     }
-}
-
 
     private void saveQuiz() {
         String quizName = quizNameField.getText().trim();
@@ -183,17 +188,83 @@ private void addQuestion() {
     }
 
     private void showLoadQuiz() {
-        String[] quizzes = quizManager.getQuizNames();
-        if (quizzes.length == 0) {
-            JOptionPane.showMessageDialog(frame, "No quizzes available.");
-            return;
-        }
+        frame.getContentPane().removeAll();
+        frame.setLayout(new BorderLayout());
 
-        String quizName = (String) JOptionPane.showInputDialog(frame, "Select a quiz:", "Load Quiz",
-                JOptionPane.QUESTION_MESSAGE, null, quizzes, quizzes[0]);
+        JLabel searchLabel = new JLabel("Search for a quiz...", SwingConstants.LEFT);
+        searchLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        frame.add(searchLabel, BorderLayout.NORTH);
 
-        if (quizName != null && !quizName.isEmpty()) {
-            quizManager.loadQuiz(quizName, frame, username);
+        searchField = new JTextField();
+        searchField.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                updateQuizComboBox();
+            }
+        });
+
+        quizComboBox = new JComboBox<>(quizManager.getQuizNames());
+        quizComboBox.setEditable(false);
+
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        searchPanel.add(searchField, BorderLayout.NORTH);
+        searchPanel.add(quizComboBox, BorderLayout.SOUTH);
+
+        frame.add(searchPanel, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel(new GridLayout(1, 3));
+        JButton loadQuizButton = new JButton("Load Quiz");
+        JButton deleteQuizButton = new JButton("Delete Quiz");
+        JButton exitButton = new JButton("Exit");
+
+        loadQuizButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String selectedQuiz = (String) quizComboBox.getSelectedItem();
+                if (selectedQuiz != null && !selectedQuiz.trim().isEmpty()) {
+                    quizManager.loadQuiz(selectedQuiz, frame, username);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Please select a quiz to load.");
+                }
+            }
+        });
+
+        deleteQuizButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String selectedQuiz = (String) quizComboBox.getSelectedItem();
+                if (selectedQuiz != null && !selectedQuiz.trim().isEmpty()) {
+                    quizManager.deleteQuiz(selectedQuiz);
+                    quizComboBox.removeItem(selectedQuiz);
+                    JOptionPane.showMessageDialog(frame, "Quiz deleted successfully!");
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Please select a quiz to delete.");
+                }
+            }
+        });
+
+        exitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showMainMenu();
+            }
+        });
+
+        buttonPanel.add(loadQuizButton);
+        buttonPanel.add(deleteQuizButton);
+        buttonPanel.add(exitButton);
+
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+
+        frame.revalidate();
+        frame.repaint();
+        frame.setVisible(true);
+    }
+
+    private void updateQuizComboBox() {
+        String searchText = searchField.getText().trim().toLowerCase();
+        quizComboBox.removeAllItems();
+        for (String quizName : quizManager.getQuizNames()) {
+            if (quizName.toLowerCase().contains(searchText)) {
+                quizComboBox.addItem(quizName);
+            }
         }
     }
+
 }

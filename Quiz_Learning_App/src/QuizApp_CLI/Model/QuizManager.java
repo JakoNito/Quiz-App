@@ -5,17 +5,10 @@ import QuizApp_CLI.View.QuestionDisplayMode;
 import QuizApp_CLI.View.MultiChoiceMode;
 import QuizApp_CLI.View.BlindMode;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import javax.swing.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
-import QuizApp_CLI.View.QuestionDisplayMode;
-import QuizApp_CLI.View.MultiChoiceMode;
-import QuizApp_CLI.View.BlindMode;
-import javax.swing.*;
-import java.util.*;
 
 public class QuizManager {
     private Map<String, QuizStructure> quizzes = new HashMap<>();
@@ -78,6 +71,11 @@ public class QuizManager {
 
     public String[] getQuizNames() {
         return quizzes.keySet().toArray(new String[0]);
+    }
+
+    public void deleteQuiz(String quizName) {
+        quizzes.remove(quizName);
+        saveData();
     }
 
     public void loadData() {
