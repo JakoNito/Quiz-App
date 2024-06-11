@@ -5,6 +5,15 @@ import QuizApp_CLI.View.QuestionDisplayMode;
 import QuizApp_CLI.View.MultiChoiceMode;
 import QuizApp_CLI.View.BlindMode;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import QuizApp_CLI.View.QuestionDisplayMode;
+import QuizApp_CLI.View.MultiChoiceMode;
+import QuizApp_CLI.View.BlindMode;
 import javax.swing.*;
 import java.util.*;
 
@@ -46,35 +55,38 @@ public class QuizManager {
                 displayMode = new MultiChoiceMode(quizStructure.getAllChoices(), frame);
                 break;
             default:
-                JOptionPane.showMessageDialog(frame, "Invalid choice. Defaulting to Blind Mode.");
                 displayMode = new BlindMode();
         }
 
-        Quiz quiz = new Quiz(quizStructure.getQuizName(), questions, user, displayMode);
-
         for (Question question : questions) {
-            displayMode.displayQuestion(frame, question);
-            String userAnswer = displayMode.getAnswer(frame);
-            quiz.answerQuestion(question, userAnswer);
+            displayMode.displayQuestion(question);
+            String userAnswer = JOptionPane.showInputDialog(frame, question.getQuestion());
+            if (userAnswer == null || userAnswer.equalsIgnoreCase("x")) {
+                JOptionPane.showMessageDialog(frame, "Exiting quiz...");
+                return;
+            }
+            if (question.isCorrect(userAnswer)) {
+                JOptionPane.showMessageDialog(frame, "Correct!");
+                user.increaseScore();
+            } else {
+                JOptionPane.showMessageDialog(frame, "Incorrect! Correct answer: " + question.getCorrectAnswer());
+            }
         }
 
-        int score = quiz.calculateScore();
-        JOptionPane.showMessageDialog(frame, "Quiz completed! Your score: " + score + "/" + questions.size());
+        JOptionPane.showMessageDialog(frame, "Your score: " + user.getScore());
     }
 
     public String[] getQuizNames() {
         return quizzes.keySet().toArray(new String[0]);
     }
 
-    public QuizStructure getQuizByName(String quizName) {
-        return quizzes.get(quizName);
+    public void loadData() {
+        // Load data from database
+        dataManager.loadDataFromFiles(quizzes);
     }
 
-    private void saveData() {
-        dataManager.saveQuizzes(quizzes);
-    }
-
-    private void loadData() {
-        quizzes = dataManager.loadQuizzes();
+    public void saveData() {
+        // Save data to database
+        dataManager.saveDataToFiles(quizzes);
     }
 }

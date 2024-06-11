@@ -9,6 +9,8 @@ package QuizApp_CLI.Model;
  * @author jakoi
  */
 
+import java.util.ArrayList;
+import java.util.List;
 public class Question {
     private String question;
     private String correctAnswer;
