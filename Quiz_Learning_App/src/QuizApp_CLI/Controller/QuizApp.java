@@ -8,6 +8,7 @@ import QuizApp_CLI.Model.QuizManager;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class QuizApp {
     private QuizManager quizManager = new QuizManager();
@@ -45,7 +46,8 @@ public class QuizApp {
                 } else {
                     String quizName = JOptionPane.showInputDialog("Enter the quiz name:");
                     if (quizName != null && !quizName.trim().isEmpty()) {
-                        quizManager.createQuiz(quizName);
+                    quizManager.createQuiz(quizName, new ArrayList<>());
+
                     }
                 }
             }

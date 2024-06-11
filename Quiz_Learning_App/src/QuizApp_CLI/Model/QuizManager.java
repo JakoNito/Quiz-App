@@ -11,8 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import QuizApp_CLI.db.DataManager;
-
+import QuizApp_CLI.View.QuestionDisplayMode;
+import QuizApp_CLI.View.MultiChoiceMode;
+import QuizApp_CLI.View.BlindMode;
 import javax.swing.*;
 import java.util.*;
 
@@ -22,27 +23,14 @@ public class QuizManager {
     private DataManager dataManager = new DataManager();
 
     public QuizManager() {
+        // Load data when the application starts
         loadData();
     }
 
-    public void createQuiz(String quizName) {
-        QuizStructure quizStructure = new QuizStructure(quizName);
-        while (true) {
-            String questionText = JOptionPane.showInputDialog("Enter question (or leave blank to finish):");
-            if (questionText == null || questionText.isEmpty()) {
-                break;
-            }
-
-            String answer = JOptionPane.showInputDialog("Enter answer:");
-            if (answer == null || answer.isEmpty()) {
-                break;
-            }
-
-            quizStructure.addQuestion(new Question(questionText, answer));
-        }
-
+    public void createQuiz(String quizName, List<Question> questions) {
+        QuizStructure quizStructure = new QuizStructure(quizName, questions);
         quizzes.put(quizName, quizStructure);
-        saveData();
+        saveData(); // Save the quizzes after adding a new quiz
     }
 
     public void loadQuiz(String quizName, JFrame frame, String username) {
@@ -53,31 +41,25 @@ public class QuizManager {
         }
 
         User user = userManager.getOrCreateUser(frame, username);
-        List<Question> questions = quizStructure.getQuestions();
 
-        if (questions.size() < 4) {
-            JOptionPane.showMessageDialog(frame, "This quiz does not support the multi-choice mode due to insufficient questions.\nDefaulting to Blind Mode.");
-            loadBlindMode(questions, user, frame);
-            return;
-        }
+        List<Question> questions = quizStructure.getQuestions();
 
         String modeChoice = JOptionPane.showInputDialog(frame, "Select display mode:\n1. Blind Mode\n2. Multi-choice Mode");
 
+        QuestionDisplayMode displayMode;
         switch (modeChoice) {
             case "1":
-                loadBlindMode(questions, user, frame);
+                displayMode = new BlindMode();
                 break;
             case "2":
-                loadMultiChoiceMode(questions, user, frame);
+                displayMode = new MultiChoiceMode(quizStructure.getAllChoices(), frame);
                 break;
             default:
-                JOptionPane.showMessageDialog(frame, "Invalid choice. Defaulting to Blind Mode.");
-                loadBlindMode(questions, user, frame);
+                displayMode = new BlindMode();
         }
-    }
 
-    private void loadBlindMode(List<Question> questions, User user, JFrame frame) {
         for (Question question : questions) {
+            displayMode.displayQuestion(question);
             String userAnswer = JOptionPane.showInputDialog(frame, question.getQuestion());
             if (userAnswer == null || userAnswer.equalsIgnoreCase("x")) {
                 JOptionPane.showMessageDialog(frame, "Exiting quiz...");
@@ -94,50 +76,17 @@ public class QuizManager {
         JOptionPane.showMessageDialog(frame, "Your score: " + user.getScore());
     }
 
-    private void loadMultiChoiceMode(List<Question> questions, User user, JFrame frame) {
-        List<String> allChoices = new ArrayList<>();
-        for (Question q : questions) {
-            allChoices.add(q.getCorrectAnswer());
-            allChoices.addAll(q.getChoices());
-        }
-        Collections.shuffle(allChoices);
-
-        for (Question question : questions) {
-            List<String> choices = new ArrayList<>(question.getChoices());
-            choices.add(question.getCorrectAnswer());
-            Collections.shuffle(choices);
-
-            StringBuilder message = new StringBuilder(question.getQuestion() + "\n");
-            for (int i = 0; i < choices.size(); i++) {
-                message.append((char) ('a' + i)).append(". ").append(choices.get(i)).append("\n");
-            }
-
-            String userAnswer = JOptionPane.showInputDialog(frame, message.toString());
-            if (userAnswer == null || userAnswer.equalsIgnoreCase("x")) {
-                JOptionPane.showMessageDialog(frame, "Exiting quiz...");
-                return;
-            }
-
-            if (question.isCorrect(userAnswer)) {
-                JOptionPane.showMessageDialog(frame, "Correct!");
-                user.increaseScore();
-            } else {
-                JOptionPane.showMessageDialog(frame, "Incorrect! Correct answer: " + question.getCorrectAnswer());
-            }
-        }
-
-        JOptionPane.showMessageDialog(frame, "Your score: " + user.getScore());
-    }
-
     public String[] getQuizNames() {
         return quizzes.keySet().toArray(new String[0]);
     }
 
     public void loadData() {
+        // Load data from database
         dataManager.loadDataFromFiles(quizzes);
     }
 
     public void saveData() {
+        // Save data to database
         dataManager.saveDataToFiles(quizzes);
     }
 }

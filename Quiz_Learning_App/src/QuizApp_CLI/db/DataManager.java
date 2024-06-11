@@ -2,10 +2,12 @@ package QuizApp_CLI.db;
 
 import QuizApp_CLI.Model.Question;
 import QuizApp_CLI.Model.QuizStructure;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Map;
 
 public class DataManager {
@@ -26,7 +28,8 @@ public class DataManager {
                 int quizId = quizRs.getInt("quiz_id");
                 String quizName = quizRs.getString("quiz_name");
 
-                QuizStructure quizStructure = new QuizStructure(quizName);
+QuizStructure quizStructure = new QuizStructure(quizName, Collections.emptyList());
+      // Add an empty list for questions
 
                 questionStmt.setInt(1, quizId);
                 ResultSet questionRs = questionStmt.executeQuery();
