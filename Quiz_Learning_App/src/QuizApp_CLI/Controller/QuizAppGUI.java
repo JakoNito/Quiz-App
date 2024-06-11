@@ -20,6 +20,7 @@ import java.awt.event.ActionListener;
 public class QuizAppGUI {
     private JFrame frame;
     private QuizManager quizManager;
+    private String username;
 
     public QuizAppGUI() {
         frame = new JFrame("Quiz App");
@@ -39,13 +40,17 @@ public class QuizAppGUI {
 
         createQuizButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showCreateQuiz();
+                if (ensureUsername()) {
+                    showCreateQuiz();
+                }
             }
         });
 
         loadQuizButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showLoadQuiz();
+                if (ensureUsername()) {
+                    showLoadQuiz();
+                }
             }
         });
 
@@ -62,6 +67,17 @@ public class QuizAppGUI {
         frame.revalidate();
         frame.repaint();
         frame.setVisible(true);
+    }
+
+    private boolean ensureUsername() {
+        if (username == null || username.trim().isEmpty()) {
+            username = JOptionPane.showInputDialog(frame, "Enter your username:");
+            if (username == null || username.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Username cannot be empty.");
+                return false;
+            }
+        }
+        return true;
     }
 
     private void showCreateQuiz() {
@@ -87,7 +103,8 @@ public class QuizAppGUI {
                 JOptionPane.QUESTION_MESSAGE, null, quizzes, quizzes[0]);
 
         if (quizName != null && !quizName.isEmpty()) {
-            quizManager.loadQuiz(quizName, frame);
+            quizManager.loadQuiz(quizName, frame, username);
         }
     }
 }
+

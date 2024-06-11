@@ -4,9 +4,6 @@
  */
 package QuizApp_CLI.Controller;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import QuizApp_CLI.Model.QuizManager;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -14,6 +11,8 @@ import java.awt.event.ActionListener;
 
 public class QuizApp {
     private QuizManager quizManager = new QuizManager();
+    private String username;
+
 
     public void run() {
         JFrame frame = new JFrame("Quiz App");
@@ -25,6 +24,8 @@ public class QuizApp {
         placeComponents(panel);
 
         frame.setVisible(true);
+
+        promptForUsername(frame);
     }
 
     private void placeComponents(JPanel panel) {
@@ -39,9 +40,13 @@ public class QuizApp {
         createQuizButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String quizName = JOptionPane.showInputDialog("Enter the quiz name:");
-                if (quizName != null && !quizName.trim().isEmpty()) {
-                    quizManager.createQuiz(quizName);
+                if (username == null || username.trim().isEmpty()) {
+                    promptForUsername(new JFrame());
+                } else {
+                    String quizName = JOptionPane.showInputDialog("Enter the quiz name:");
+                    if (quizName != null && !quizName.trim().isEmpty()) {
+                        quizManager.createQuiz(quizName);
+                    }
                 }
             }
         });
@@ -52,11 +57,15 @@ public class QuizApp {
         loadQuizButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String quizName = (String) JOptionPane.showInputDialog(null, "Select Quiz",
-                        "Quiz Selector", JOptionPane.QUESTION_MESSAGE, null,
-                        quizManager.getQuizNames(), quizManager.getQuizNames()[0]);
-                if (quizName != null) {
-                    quizManager.loadQuiz(quizName, new JFrame());
+                if (username == null || username.trim().isEmpty()) {
+                    promptForUsername(new JFrame());
+                } else {
+                    String quizName = (String) JOptionPane.showInputDialog(null, "Select Quiz",
+                            "Quiz Selector", JOptionPane.QUESTION_MESSAGE, null,
+                            quizManager.getQuizNames(), quizManager.getQuizNames()[0]);
+                    if (quizName != null) {
+                        quizManager.loadQuiz(quizName, new JFrame(), username);
+                    }
                 }
             }
         });
@@ -71,6 +80,16 @@ public class QuizApp {
             }
         });
         panel.add(quitButton);
+    }
+
+    private void promptForUsername(JFrame frame) {
+        while (true) {
+            username = JOptionPane.showInputDialog(frame, "Enter your username:");
+            if (username != null && !username.trim().isEmpty()) {
+                break;
+            }
+            JOptionPane.showMessageDialog(frame, "Username cannot be empty.");
+        }
     }
 }
 

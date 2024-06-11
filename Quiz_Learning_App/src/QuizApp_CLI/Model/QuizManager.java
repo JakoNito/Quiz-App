@@ -45,14 +45,14 @@ public class QuizManager {
         saveData();
     }
 
-    public void loadQuiz(String quizName, JFrame frame) {
+    public void loadQuiz(String quizName, JFrame frame, String username) {
         QuizStructure quizStructure = quizzes.get(quizName);
         if (quizStructure == null) {
             JOptionPane.showMessageDialog(frame, "Quiz not found.");
             return;
         }
 
-        User user = userManager.getOrCreateUser(frame);
+        User user = userManager.getOrCreateUser(frame, username);
         List<Question> questions = quizStructure.getQuestions();
 
         if (questions.size() < 4) {

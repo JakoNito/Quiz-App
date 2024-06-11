@@ -17,15 +17,15 @@ public class User {
         this.score = 0;
     }
 
-    public void increaseScore() {
-        score++;
+    public String getUsername() {
+        return username;
     }
 
     public int getScore() {
         return score;
     }
 
-    public String getUsername() {
-        return username;
+    public void increaseScore() {
+        score++;
     }
 }
