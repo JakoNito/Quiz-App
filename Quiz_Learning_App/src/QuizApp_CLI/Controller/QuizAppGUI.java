@@ -328,24 +328,54 @@ public class QuizAppGUI {
 
     private void startBlindMode(List<Question> questions) {
         User user = quizManager.getUser(username);
+        int currentQuestionIndex = 0;
 
-        for (Question question : questions) {
-            QuestionDisplayMode displayMode = new BlindMode();
-            displayMode.displayQuestion(question);
-            String userAnswer = JOptionPane.showInputDialog(frame, question.getQuestion());
-            if (userAnswer == null || userAnswer.equalsIgnoreCase("x")) {
-                JOptionPane.showMessageDialog(frame, "Exiting quiz...");
-                return;
-            }
-            if (question.isCorrect(userAnswer)) {
-                JOptionPane.showMessageDialog(frame, "Correct!");
-                user.increaseScore();
-            } else {
-                JOptionPane.showMessageDialog(frame, "Incorrect! Correct answer: " + question.getCorrectAnswer());
-            }
+        displayBlindQuestion(questions, currentQuestionIndex, user);
+    }
+
+    private void displayBlindQuestion(List<Question> questions, int index, User user) {
+        if (index >= questions.size()) {
+            JOptionPane.showMessageDialog(frame, username + ", you scored " + user.getScore() + "/" + questions.size());
+            showMainMenu();
+            return;
         }
 
-        JOptionPane.showMessageDialog(frame, username + ", you scored " + user.getScore() + "/" + questions.size());
+        Question question = questions.get(index);
+
+        frame.getContentPane().removeAll();
+        frame.setLayout(new BorderLayout());
+
+        JLabel questionLabel = new JLabel(question.getQuestion());
+        questionLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        questionLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding
+        frame.add(questionLabel, BorderLayout.NORTH);
+
+        JTextField answerField = new JTextField();
+        answerField.setFont(new Font("Arial", Font.PLAIN, 18));
+        frame.add(answerField, BorderLayout.CENTER);
+
+        JButton submitButton = new JButton("Submit Answer");
+        submitButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String userAnswer = answerField.getText().trim();
+                if (userAnswer == null || userAnswer.equalsIgnoreCase("x")) {
+                    JOptionPane.showMessageDialog(frame, "Exiting quiz...");
+                    return;
+                }
+                if (question.isCorrect(userAnswer)) {
+                    JOptionPane.showMessageDialog(frame, "Correct!");
+                    user.increaseScore();
+                } else {
+                    JOptionPane.showMessageDialog(frame, "Incorrect! Correct answer: " + question.getCorrectAnswer());
+                }
+                displayBlindQuestion(questions, index + 1, user);
+            }
+        });
+
+        frame.add(submitButton, BorderLayout.SOUTH);
+
+        frame.revalidate();
+        frame.repaint();
     }
 
     private void startMultiChoiceMode(QuizStructure quizStructure, List<Question> questions) {
@@ -371,6 +401,7 @@ public class QuizAppGUI {
 
         JLabel questionLabel = new JLabel(question.getQuestion());
         questionLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        questionLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding
         frame.add(questionLabel, BorderLayout.NORTH);
 
         JPanel choicesPanel = new JPanel(new GridLayout(4, 1, 10, 10));
