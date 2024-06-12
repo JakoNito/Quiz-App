@@ -1,7 +1,7 @@
 package QuizApp_CLI.db;
 
-import QuizApp_CLI.Model.Question;
-import QuizApp_CLI.Model.QuizStructure;
+import Model.Question;
+import Model.QuizStructure;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
