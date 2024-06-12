@@ -1,3 +1,4 @@
 
 How to run:
-- Run Main.java in IDE
+- Open dist folder
+- Open adn run Quiz_Learning_App
