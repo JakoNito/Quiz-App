@@ -28,4 +28,8 @@ public class User {
     public void increaseScore() {
         score++;
     }
+    
+    public void resetScore() {
+        score = 0;
+    }
 }

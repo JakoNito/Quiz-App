@@ -319,6 +319,9 @@ public class QuizAppGUI {
         QuizStructure quizStructure = quizManager.getQuiz(quizName);
         List<Question> questions = quizStructure.getQuestions();
 
+        User user = quizManager.getUser(username);
+        user.resetScore();
+        
         if (mode == 1) {
             startBlindMode(questions);
         } else {
