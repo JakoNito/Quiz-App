@@ -47,9 +47,8 @@ public class DBManager {
     }
 
     public static void setupDatabase() {
-        try (Connection conn = getConnection();
-             Statement stmt = conn.createStatement()) {
-            
+        try ( Connection conn = getConnection();  Statement stmt = conn.createStatement()) {
+
             if (!doesTableExist(conn, "QUIZZES")) {
                 // Create Quizzes table
                 stmt.executeUpdate("CREATE TABLE QUIZZES ("
@@ -65,7 +64,8 @@ public class DBManager {
                         + "quiz_id INT, "
                         + "question_text VARCHAR(255), "
                         + "correct_answer VARCHAR(255), "
-                        + "FOREIGN KEY (quiz_id) REFERENCES Quizzes (quiz_id))");
+                        + "FOREIGN KEY (quiz_id) REFERENCES Quizzes (quiz_id), "
+                        + "CONSTRAINT unique_question UNIQUE (quiz_id, question_text))");
                 System.out.println("Questions table created successfully.");
             }
 
@@ -79,7 +79,7 @@ public class DBManager {
     private static boolean doesTableExist(Connection conn, String tableName) {
         try {
             DatabaseMetaData dbMetaData = conn.getMetaData();
-            try (ResultSet rs = dbMetaData.getTables(null, null, tableName.toUpperCase(), null)) {
+            try ( ResultSet rs = dbMetaData.getTables(null, null, tableName.toUpperCase(), null)) {
                 return rs.next();
             }
         } catch (SQLException e) {

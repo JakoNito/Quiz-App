@@ -81,10 +81,21 @@ public class DataManager {
 
                 // Insert questions
                 for (Question question : quizStructure.getQuestions()) {
-                    questionStmt.setInt(1, quizId);
-                    questionStmt.setString(2, question.getQuestion());
-                    questionStmt.setString(3, question.getCorrectAnswer());
-                    questionStmt.executeUpdate();
+                    // Check if question already exists for this quiz
+                    PreparedStatement selectQuestionStmt = conn.prepareStatement(
+                            "SELECT 1 FROM Questions WHERE quiz_id = ? AND question_text = ?"
+                    );
+                    selectQuestionStmt.setInt(1, quizId);
+                    selectQuestionStmt.setString(2, question.getQuestion());
+                    ResultSet existingQuestionRs = selectQuestionStmt.executeQuery();
+
+                    if (!existingQuestionRs.next()) {
+                        questionStmt.setInt(1, quizId);
+                        questionStmt.setString(2, question.getQuestion());
+                        questionStmt.setString(3, question.getCorrectAnswer());
+                        questionStmt.executeUpdate();
+                    }
+                    selectQuestionStmt.close();
                 }
             }
 
@@ -92,11 +103,9 @@ public class DataManager {
             System.out.println("Error saving quizzes: " + e.getMessage());
         }
     }
-    
+
     public void deleteQuizFromDatabase(String quizName) {
-        try (Connection conn = DBManager.getConnection();
-             PreparedStatement deleteQuestionsStmt = conn.prepareStatement(DELETE_QUESTIONS_SQL);
-             PreparedStatement deleteQuizStmt = conn.prepareStatement(DELETE_QUIZ_SQL)) {
+        try ( Connection conn = DBManager.getConnection();  PreparedStatement deleteQuestionsStmt = conn.prepareStatement(DELETE_QUESTIONS_SQL);  PreparedStatement deleteQuizStmt = conn.prepareStatement(DELETE_QUIZ_SQL)) {
 
             deleteQuestionsStmt.setString(1, quizName);
             deleteQuestionsStmt.executeUpdate();

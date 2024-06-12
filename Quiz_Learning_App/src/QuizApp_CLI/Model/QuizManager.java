@@ -79,6 +79,7 @@ public class QuizManager {
 
     public void loadData() {
         // Load data from database
+        quizzes.clear();
         dataManager.loadDataFromFiles(quizzes);
     }
 
