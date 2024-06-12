@@ -63,6 +63,7 @@ public class QuizManager {
         }
 
         JOptionPane.showMessageDialog(frame, username + ", you scored " + user.getScore() + "/" + questions.size());
+        
     }
 
     public String[] getQuizNames() {
