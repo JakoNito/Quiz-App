@@ -1,19 +1,19 @@
 ----------------------------------------------------------------
-Wed Jun 12 14:45:15 NZST 2024:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.2 - (1629631): instance a816c00e-0190-0a55-d43f-00000fab2320 
-on database directory /Users/jakonito/Documents/GitHub/Quiz-App/Quiz_Learning_App/QuizDB_Ebd with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@677327b6 
-Loaded from file:/Users/jakonito/Documents/GitHub/Quiz-App/Quiz_Learning_App/lib/derby.jar
+Wed Jun 12 15:06:22 NZST 2024:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.11.1.2 - (1629631): instance a816c00e-0190-0a69-28a8-000007808218 
+on database directory /Users/johann/Documents/GitHub/Quiz-App/Quiz_Learning_App/QuizDB_Ebd with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5c0369c4 
+Loaded from file:/Users/johann/Documents/GitHub/Quiz-App/Quiz_Learning_App/lib/derby.jar
 java.vendor=Oracle Corporation
-java.runtime.version=20.0.2+9-78
-user.dir=/Users/jakonito/Documents/GitHub/Quiz-App/Quiz_Learning_App
+java.runtime.version=11.0.21+9-LTS-193
+user.dir=/Users/johann/Documents/GitHub/Quiz-App/Quiz_Learning_App
 os.name=Mac OS X
 os.arch=aarch64
-os.version=14.0
+os.version=12.2.1
 derby.system.home=null
 Database Class Loader started - derby.database.classpath=''
 ----------------------------------------------------------------
-Wed Jun 12 14:48:23 NZST 2024: Shutting down Derby engine
+Wed Jun 12 15:06:32 NZST 2024: Shutting down Derby engine
 ----------------------------------------------------------------
-Wed Jun 12 14:48:23 NZST 2024:
-Shutting down instance a816c00e-0190-0a55-d43f-00000fab2320 on database directory /Users/jakonito/Documents/GitHub/Quiz-App/Quiz_Learning_App/QuizDB_Ebd with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@677327b6 
+Wed Jun 12 15:06:32 NZST 2024:
+Shutting down instance a816c00e-0190-0a69-28a8-000007808218 on database directory /Users/johann/Documents/GitHub/Quiz-App/Quiz_Learning_App/QuizDB_Ebd with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@5c0369c4 
 ----------------------------------------------------------------

@@ -8,6 +8,7 @@ package QuizApp_CLI.Controller;
  *
  * @author johann
  */
+import QuizApp_CLI.Model.JTextFieldWithPlaceholder;
 import QuizApp_CLI.Model.QuizManager;
 import QuizApp_CLI.Model.QuizStructure;
 import QuizApp_CLI.Model.Question;
@@ -129,7 +130,7 @@ public class QuizAppGUI {
         frame.add(scrollPane, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
-        JButton addQuestionButton = new JButton("Add More Questions");
+        JButton addQuestionButton = new JButton("Add Question");
         JButton saveQuizButton = new JButton("Save Quiz");
         JButton exitButton = new JButton("Exit");
 
@@ -193,75 +194,78 @@ public class QuizAppGUI {
         showMainMenu();
     }
 
-    private void showLoadQuiz() {
-        frame.getContentPane().removeAll();
-        frame.setLayout(new BorderLayout());
+  private void showLoadQuiz() {
+    frame.getContentPane().removeAll();
+    frame.setLayout(new BorderLayout());
 
-        JLabel searchLabel = new JLabel("Search for a quiz...", SwingConstants.LEFT);
-        searchLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        frame.add(searchLabel, BorderLayout.NORTH);
+    JLabel searchLabel = new JLabel("Search for a quiz...", SwingConstants.LEFT);
+    searchLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    frame.add(searchLabel, BorderLayout.NORTH);
 
-        searchField = new JTextField();
-        searchField.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                updateQuizComboBox();
+    // Use the custom JTextFieldWithPlaceholder
+    searchField = new JTextFieldWithPlaceholder("Enter full quiz name...");
+    searchField.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            updateQuizComboBox();
+        }
+    });
+
+    quizComboBox = new JComboBox<>(quizManager.getQuizNames());
+    quizComboBox.setEditable(false);
+
+    JPanel searchPanel = new JPanel(new BorderLayout());
+    searchPanel.add(searchField, BorderLayout.NORTH);
+    searchPanel.add(quizComboBox, BorderLayout.SOUTH);
+
+    frame.add(searchPanel, BorderLayout.CENTER);
+
+    JPanel buttonPanel = new JPanel(new GridLayout(1, 3));
+    JButton loadQuizButton = new JButton("Load Quiz");
+    JButton deleteQuizButton = new JButton("Delete Quiz");
+    JButton exitButton = new JButton("Exit");
+
+    loadQuizButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            String selectedQuiz = (String) quizComboBox.getSelectedItem();
+            if (selectedQuiz != null && !selectedQuiz.trim().isEmpty()) {
+                showQuizModeOptions(selectedQuiz);
+            } else {
+                JOptionPane.showMessageDialog(frame, "Please select a quiz to load.");
             }
-        });
+        }
+    });
 
-        quizComboBox = new JComboBox<>(quizManager.getQuizNames());
-        quizComboBox.setEditable(false);
-
-        JPanel searchPanel = new JPanel(new BorderLayout());
-        searchPanel.add(searchField, BorderLayout.NORTH);
-        searchPanel.add(quizComboBox, BorderLayout.SOUTH);
-
-        frame.add(searchPanel, BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel(new GridLayout(1, 3));
-        JButton loadQuizButton = new JButton("Load Quiz");
-        JButton deleteQuizButton = new JButton("Delete Quiz");
-        JButton exitButton = new JButton("Exit");
-
-        loadQuizButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String selectedQuiz = (String) quizComboBox.getSelectedItem();
-                if (selectedQuiz != null && !selectedQuiz.trim().isEmpty()) {
-                    showQuizModeOptions(selectedQuiz);
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Please select a quiz to load.");
-                }
+    deleteQuizButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            String selectedQuiz = (String) quizComboBox.getSelectedItem();
+            if (selectedQuiz != null && !selectedQuiz.trim().isEmpty()) {
+                quizManager.deleteQuiz(selectedQuiz);
+                quizComboBox.removeItem(selectedQuiz);
+                JOptionPane.showMessageDialog(frame, "Quiz deleted successfully!");
+            } else {
+                JOptionPane.showMessageDialog(frame, "Please select a quiz to delete.");
             }
-        });
+        }
+    });
 
-        deleteQuizButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String selectedQuiz = (String) quizComboBox.getSelectedItem();
-                if (selectedQuiz != null && !selectedQuiz.trim().isEmpty()) {
-                    quizManager.deleteQuiz(selectedQuiz);
-                    quizComboBox.removeItem(selectedQuiz);
-                    JOptionPane.showMessageDialog(frame, "Quiz deleted successfully!");
-                } else {
-                    JOptionPane.showMessageDialog(frame, "Please select a quiz to delete.");
-                }
-            }
-        });
+    exitButton.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            showMainMenu();
+        }
+    });
 
-        exitButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showMainMenu();
-            }
-        });
+    buttonPanel.add(loadQuizButton);
+    buttonPanel.add(deleteQuizButton);
+    buttonPanel.add(exitButton);
 
-        buttonPanel.add(loadQuizButton);
-        buttonPanel.add(deleteQuizButton);
-        buttonPanel.add(exitButton);
+    frame.add(buttonPanel, BorderLayout.SOUTH);
 
-        frame.add(buttonPanel, BorderLayout.SOUTH);
+    frame.revalidate();
+    frame.repaint();
+    frame.setVisible(true);
+}
 
-        frame.revalidate();
-        frame.repaint();
-        frame.setVisible(true);
-    }
+
 
     private void updateQuizComboBox() {
         String searchText = searchField.getText().trim().toLowerCase();
