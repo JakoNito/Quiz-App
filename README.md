@@ -1,4 +1,3 @@
 
 How to run:
-- Open dist folder
-- Open adn run Quiz_Learning_App
+- run dist\Quiz_Learning_App.jar file
