@@ -1,6 +1,6 @@
 package Controller;
 
-import QuizApp_CLI.db.DBManager;
+import Database.DBManager;
 
 import javax.swing.*;
 

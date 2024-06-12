@@ -1,6 +1,6 @@
 package Model;
 
-import QuizApp_CLI.db.DataManager;
+import Database.DataManager;
 import View.QuestionDisplayMode;
 import View.MultiChoiceMode;
 import View.BlindMode;
