@@ -17,19 +17,19 @@ public class DataManager {
     private static final String SELECT_QUIZZES_SQL = "SELECT quiz_id, quiz_name FROM Quizzes";
     private static final String SELECT_QUESTIONS_SQL = "SELECT question_text, correct_answer FROM Questions WHERE quiz_id = ?";
     private static final String SELECT_QUIZ_BY_NAME_SQL = "SELECT quiz_id FROM Quizzes WHERE quiz_name = ?";
+    private static final String DELETE_QUIZ_SQL = "DELETE FROM Quizzes WHERE quiz_name = ?";
+    private static final String DELETE_QUESTIONS_SQL = "DELETE FROM Questions WHERE quiz_id = (SELECT quiz_id FROM Quizzes WHERE quiz_name = ?)";
 
     public void loadDataFromFiles(Map<String, QuizStructure> quizzes) {
-        try (Connection conn = DBManager.getConnection();
-             PreparedStatement quizStmt = conn.prepareStatement(SELECT_QUIZZES_SQL);
-             PreparedStatement questionStmt = conn.prepareStatement(SELECT_QUESTIONS_SQL)) {
+        try ( Connection conn = DBManager.getConnection();  PreparedStatement quizStmt = conn.prepareStatement(SELECT_QUIZZES_SQL);  PreparedStatement questionStmt = conn.prepareStatement(SELECT_QUESTIONS_SQL)) {
 
             ResultSet quizRs = quizStmt.executeQuery();
             while (quizRs.next()) {
                 int quizId = quizRs.getInt("quiz_id");
                 String quizName = quizRs.getString("quiz_name");
 
-QuizStructure quizStructure = new QuizStructure(quizName, Collections.emptyList());
-      // Add an empty list for questions
+                QuizStructure quizStructure = new QuizStructure(quizName, Collections.emptyList());
+                // Add an empty list for questions
 
                 questionStmt.setInt(1, quizId);
                 ResultSet questionRs = questionStmt.executeQuery();
@@ -48,10 +48,7 @@ QuizStructure quizStructure = new QuizStructure(quizName, Collections.emptyList(
     }
 
     public void saveDataToFiles(Map<String, QuizStructure> quizzes) {
-        try (Connection conn = DBManager.getConnection();
-             PreparedStatement quizStmt = conn.prepareStatement(INSERT_QUIZ_SQL, PreparedStatement.RETURN_GENERATED_KEYS);
-             PreparedStatement questionStmt = conn.prepareStatement(INSERT_QUESTION_SQL);
-             PreparedStatement selectQuizByNameStmt = conn.prepareStatement(SELECT_QUIZ_BY_NAME_SQL)) {
+        try ( Connection conn = DBManager.getConnection();  PreparedStatement quizStmt = conn.prepareStatement(INSERT_QUIZ_SQL, PreparedStatement.RETURN_GENERATED_KEYS);  PreparedStatement questionStmt = conn.prepareStatement(INSERT_QUESTION_SQL);  PreparedStatement selectQuizByNameStmt = conn.prepareStatement(SELECT_QUIZ_BY_NAME_SQL)) {
 
             if (conn == null || conn.isClosed()) {
                 System.out.println("No current connection");
@@ -93,6 +90,22 @@ QuizStructure quizStructure = new QuizStructure(quizName, Collections.emptyList(
 
         } catch (SQLException e) {
             System.out.println("Error saving quizzes: " + e.getMessage());
+        }
+    }
+    
+    public void deleteQuizFromDatabase(String quizName) {
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement deleteQuestionsStmt = conn.prepareStatement(DELETE_QUESTIONS_SQL);
+             PreparedStatement deleteQuizStmt = conn.prepareStatement(DELETE_QUIZ_SQL)) {
+
+            deleteQuestionsStmt.setString(1, quizName);
+            deleteQuestionsStmt.executeUpdate();
+
+            deleteQuizStmt.setString(1, quizName);
+            deleteQuizStmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.out.println("Error deleting quiz: " + e.getMessage());
         }
     }
 }

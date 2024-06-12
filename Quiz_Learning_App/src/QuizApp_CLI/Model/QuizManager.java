@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class QuizManager {
+
     private Map<String, QuizStructure> quizzes = new HashMap<>();
     private UserManager userManager = new UserManager();
     private DataManager dataManager = new DataManager();
@@ -63,7 +64,7 @@ public class QuizManager {
         }
 
         JOptionPane.showMessageDialog(frame, username + ", you scored " + user.getScore() + "/" + questions.size());
-        
+
     }
 
     public String[] getQuizNames() {
@@ -72,6 +73,7 @@ public class QuizManager {
 
     public void deleteQuiz(String quizName) {
         quizzes.remove(quizName);
+        dataManager.deleteQuizFromDatabase(quizName);
         saveData();
     }
 
@@ -85,4 +87,3 @@ public class QuizManager {
         dataManager.saveDataToFiles(quizzes);
     }
 }
-
